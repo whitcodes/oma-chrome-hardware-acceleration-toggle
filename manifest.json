@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "whitcodes.chromehwaccel",
+  "name": "Chrome HW Accel",
+  "version": "1.0.0",
+  "author": "Whit Allee",
+  "license": "MIT",
+  "description": "Bar toggle for Chrome/Chromium hardware acceleration -- flips the setting and restarts the browser with tabs restored. Useful when GPU acceleration causes freezing/jitter on video playback.",
+  "kinds": ["bar-widget"],
+  "activation": "on-demand",
+  "entryPoints": {
+    "barWidget": "Panel.qml"
+  },
+  "barWidget": {
+    "displayName": "Chrome HW Accel",
+    "description": "Shows whether Chrome/Chromium hardware acceleration is on or off. Click to open, then confirm to toggle and restart the browser with tabs restored.",
+    "category": "System",
+    "aliases": ["chrome", "chromium", "hwaccel", "gpu", "hardware-acceleration"],
+    "allowMultiple": false,
+    "defaults": {
+      "pollIntervalSec": 20
+    },
+    "schema": [
+      {
+        "key": "pollIntervalSec",
+        "type": "integer",
+        "label": "Status refresh interval (seconds)",
+        "min": 5,
+        "max": 300,
+        "step": 5,
+        "defaultValue": 20
+      }
+    ]
+  }
+}

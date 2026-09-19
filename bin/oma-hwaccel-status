@@ -1,0 +1,22 @@
+#!/bin/bash
+# Reports current Chrome/Chromium hardware acceleration state as JSON, for
+# the bar widget to poll. Never touches anything -- read-only.
+set -euo pipefail
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$DIR/oma-hwaccel-lib.sh"
+
+if ! detect_browser; then
+  jq -n '{found:false}'
+  exit 0
+fi
+
+enabled="$(hwaccel_enabled)"
+running="false"
+if browser_running; then running="true"; fi
+
+jq -n \
+  --arg browser "$BROWSER_BIN" \
+  --arg label "$BROWSER_LABEL" \
+  --argjson enabled "$enabled" \
+  --argjson running "$running" \
+  '{found: true, browser: $browser, label: $label, enabled: $enabled, running: $running}'

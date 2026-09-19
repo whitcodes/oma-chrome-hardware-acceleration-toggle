@@ -1,0 +1,67 @@
+#!/bin/bash
+# Flips Chrome/Chromium's hardware acceleration setting and, if the
+# browser is running, restarts it so the change takes effect.
+#
+# Ordering matters here. The setting only lives in Local State, which
+# Chromium's own pref service holds in memory and flushes to disk on
+# various triggers -- including as part of a normal shutdown, using
+# whatever value it still has in memory. If we edited the file *before*
+# asking Chromium to quit, that shutdown flush could silently overwrite
+# our edit with the old value a moment later. So: quit first, wait for the
+# process to fully exit, edit the file, then relaunch.
+#
+# Relaunch uses --restore-last-session so tabs come back regardless of the
+# browser's own "on startup" setting, which on a fresh/default profile is
+# the New Tab page rather than session restore.
+set -euo pipefail
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$DIR/oma-hwaccel-lib.sh"
+
+if ! detect_browser; then
+  jq -n '{ok:false, error:"No Chrome or Chromium install found"}'
+  exit 1
+fi
+
+if [ ! -f "$BROWSER_LOCAL_STATE" ]; then
+  jq -n --arg label "$BROWSER_LABEL" \
+    '{ok:false, error:($label + " has never been launched -- no Local State file yet")}'
+  exit 1
+fi
+
+current="$(hwaccel_enabled)"
+if [ "$current" = "true" ]; then new="false"; else new="true"; fi
+
+was_running="false"
+if browser_running; then was_running="true"; fi
+
+if [ "$was_running" = "true" ]; then
+  main_pid="$(browser_main_pid || true)"
+  if [ -n "$main_pid" ]; then
+    kill -TERM "$main_pid" 2>/dev/null || true
+  else
+    pkill -TERM -x "$BROWSER_PROC_NAME" 2>/dev/null || true
+  fi
+
+  waited=0
+  while browser_running && [ "$waited" -lt 30 ]; do
+    sleep 0.5
+    waited=$((waited + 1))
+  done
+  if browser_running; then
+    # Didn't quit cleanly in 15s -- force it rather than hang forever.
+    pkill -KILL -x "$BROWSER_PROC_NAME" 2>/dev/null || true
+    sleep 0.5
+  fi
+fi
+
+tmp="$(mktemp "${BROWSER_LOCAL_STATE}.XXXXXX")"
+jq --argjson v "$new" '.hardware_acceleration_mode.enabled = $v' "$BROWSER_LOCAL_STATE" > "$tmp"
+mv "$tmp" "$BROWSER_LOCAL_STATE"
+
+if [ "$was_running" = "true" ]; then
+  nohup "$BROWSER_BIN" --restore-last-session >/dev/null 2>&1 &
+  disown
+fi
+
+jq -n --argjson enabled "$new" --argjson restarted "$was_running" \
+  '{ok: true, enabled: $enabled, restarted: $restarted}'
