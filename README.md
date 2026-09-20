@@ -65,6 +65,16 @@ omarchy plugin add /home/whitcodes/Work/Dev/oma-chrome-hardware-acceleration-tog
 
 `omarchy plugin validate <folder>` checks the manifest before installing.
 
+## Uninstall
+
+```sh
+omarchy plugin remove whitcodes.chromehwaccel
+```
+
+This only removes the plugin itself -- it never touches Chrome/Chromium's
+own settings beyond whatever `hardware_acceleration_mode.enabled` value you
+last toggled to, which stays exactly as Chrome's own Settings page left it.
+
 ## Using it
 
 - Click the **GPU** bar icon to open the panel. It shows whether Chrome or
