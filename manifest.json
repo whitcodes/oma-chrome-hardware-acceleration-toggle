@@ -3,7 +3,7 @@
   "id": "whitcodes.chromehwaccel",
   "name": "Chrome HW Accel",
   "version": "1.0.0",
-  "author": "Whit Allee",
+  "author": "Whit Milan <whitmilan00@gmail.com>",
   "license": "MIT",
   "description": "Bar toggle for Chrome/Chromium hardware acceleration -- flips the setting and restarts the browser with tabs restored. Useful when GPU acceleration causes freezing/jitter on video playback.",
   "kinds": ["bar-widget"],
