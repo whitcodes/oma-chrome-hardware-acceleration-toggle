@@ -54,7 +54,7 @@ directly -- no restart needed, the new value takes effect next launch.
 ## Install
 
 ```sh
-omarchy plugin add https://github.com/<you>/oma-chrome-hardware-acceleration-toggle --enable
+omarchy plugin add https://github.com/whitcodes/oma-chrome-hardware-acceleration-toggle --enable
 ```
 
 Or locally, for development:
