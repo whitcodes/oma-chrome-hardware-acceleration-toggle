@@ -60,7 +60,7 @@ omarchy plugin add https://github.com/<you>/oma-chrome-hardware-acceleration-tog
 Or locally, for development:
 
 ```sh
-omarchy plugin add /home/whitcodes/Work/Dev/oma-chrome-hardware-acceleration-toggle --enable
+omarchy plugin add /path/to/oma-chrome-hardware-acceleration-toggle --enable
 ```
 
 `omarchy plugin validate <folder>` checks the manifest before installing.
